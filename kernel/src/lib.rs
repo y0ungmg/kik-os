@@ -5,10 +5,37 @@ use core::panic::PanicInfo;
 
 mod serial;
 
+// Boot info structure (must match bootloader's definition)
+#[repr(C)]
+pub struct BootInfo {
+    pub magic: u64,
+    pub kernel_load_addr: u64,
+    pub kernel_size: u64,
+    pub memory_map_addr: u64,
+    pub memory_map_count: u64,
+    pub framebuffer_addr: u64,
+    pub framebuffer_width: u32,
+    pub framebuffer_height: u32,
+    pub framebuffer_pitch: u32,
+    pub framebuffer_bpp: u8,
+    pub boot_mode: u8,
+}
+
 #[unsafe(no_mangle)]
-pub extern "C" fn _start() -> ! {
+pub extern "C" fn _start(boot_info: *const BootInfo) -> ! {
     serial::init();
     serial::print("KiK OS kernel starting...\n");
+    
+    if !boot_info.is_null() {
+        let bi = unsafe { &*boot_info };
+        serial::print("Boot info received.\n");
+        if bi.boot_mode == 0 {
+            serial::print("Boot mode: BIOS\n");
+        } else {
+            serial::print("Boot mode: UEFI\n");
+        }
+    }
+    
     serial::print("Hello from KiK OS!\n");
 
     loop {
@@ -21,7 +48,6 @@ pub extern "C" fn _start() -> ! {
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     serial::print("KERNEL PANIC: ");
-    // Print panic info (simplified)
     if let Some(location) = info.location() {
         serial::print(location.file());
     }
