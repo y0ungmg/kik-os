@@ -7,6 +7,7 @@ mod gdt;
 mod idt;
 mod pmm;
 mod heap;
+mod timer;
 
 use core::panic::PanicInfo;
 
@@ -41,6 +42,9 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
     
     heap::init();
     serial::print("Heap initialized.\n");
+    
+    timer::init(100);
+    serial::print("Timer initialized.\n");
     
     serial::print("Hello from KiK OS!\n");
 
