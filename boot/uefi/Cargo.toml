@@ -1,0 +1,19 @@
+[workspace]
+
+[package]
+name = "kik-uefi-boot"
+version = "0.1.0"
+edition = "2024"
+
+[[bin]]
+name = "kik-uefi-boot"
+path = "src/main.rs"
+
+[dependencies]
+uefi = { version = "0.33", features = ["alloc", "global_allocator"] }
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
