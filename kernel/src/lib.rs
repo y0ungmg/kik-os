@@ -17,6 +17,7 @@ mod syscalls;
 mod ipc;
 mod log;
 mod pci;
+mod kikfs;
 
 // Boot info structure (must match bootloader's definition)
 #[repr(C)]
