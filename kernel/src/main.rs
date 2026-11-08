@@ -22,6 +22,10 @@ mod pci;
 mod kikfs;
 mod net;
 mod audio;
+mod usb;
+mod power;
+mod users;
+mod context_switch;
 
 use core::panic::PanicInfo;
 
@@ -62,6 +66,27 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
     
     keyboard::init();
     serial::print("Keyboard initialized.\n");
+    
+    pci::enumerate();
+    serial::print("PCI enumerated.\n");
+    
+    kikfs::init();
+    serial::print("KiKFS initialized.\n");
+    
+    net::init();
+    serial::print("Network initialized.\n");
+    
+    audio::init();
+    serial::print("Audio initialized.\n");
+    
+    usb::init();
+    serial::print("USB initialized.\n");
+    
+    power::init();
+    serial::print("Power management initialized.\n");
+    
+    users::init();
+    serial::print("User management initialized.\n");
     
     scheduler::init();
     serial::print("Scheduler initialized.\n");

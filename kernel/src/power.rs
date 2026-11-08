@@ -1,4 +1,3 @@
-#![no_std]
 
 // Power management subsystem
 
@@ -8,14 +7,10 @@ pub fn init() {
 
 pub fn shutdown() {
     // Shutdown the system
-    unsafe {
-        // ACPI shutdown
-    }
+    // ACPI shutdown (not implemented)
 }
 
 pub fn reboot() {
     // Reboot the system
-    unsafe {
-        // Keyboard controller reset
-    }
+    // Keyboard controller reset (not implemented)
 }

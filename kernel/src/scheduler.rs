@@ -1,6 +1,6 @@
 // Process Scheduler - simple round-robin
 
-use core::sync::atomic::{AtomicU64, Ordering};
+// Removed unused imports
 
 #[repr(C)]
 #[derive(Clone, Copy)]

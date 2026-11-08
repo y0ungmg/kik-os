@@ -1,6 +1,6 @@
 // Kernel logging subsystem
 
-use core::fmt::Write;
+// Removed unused import
 
 pub fn log(level: &str, message: &str) {
     // Print to serial

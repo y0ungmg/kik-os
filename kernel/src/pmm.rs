@@ -1,6 +1,6 @@
 // Physical Memory Manager (PMM) - simple bitmap allocator
 
-use core::sync::atomic::{AtomicU64, Ordering};
+// Removed unused imports
 
 const PAGE_SIZE: usize = 4096;
 const MAX_PAGES: usize = 1024 * 1024; // 4GB max

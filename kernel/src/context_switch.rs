@@ -1,4 +1,3 @@
-#![no_std]
 
 // Context switching for x86_64
 

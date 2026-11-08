@@ -36,7 +36,7 @@ static mut GDT: [GdtEntry; 5] = [
 pub fn init() {
     let gdt_ptr = GdtPointer {
         limit: (size_of::<[GdtEntry; 5]>() - 1) as u16,
-        base: unsafe { &raw const GDT as *const _ as u64 },
+        base: &raw const GDT as *const _ as u64,
     };
     
     unsafe {

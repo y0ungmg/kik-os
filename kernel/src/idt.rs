@@ -57,7 +57,7 @@ pub fn init() {
     
     let idt_ptr = IdtPointer {
         limit: (size_of::<[IdtEntry; IDT_ENTRIES]>() - 1) as u16,
-        base: unsafe { &raw const IDT as *const _ as u64 },
+        base: &raw const IDT as *const _ as u64,
     };
     
     unsafe {

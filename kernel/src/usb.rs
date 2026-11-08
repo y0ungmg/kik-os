@@ -1,4 +1,3 @@
-#![no_std]
 
 // USB subsystem - basic structure
 
