@@ -10,18 +10,27 @@ KiK OS is built from scratch. It is not a Linux distribution, desktop theme, web
 
 ## Development Status
 
-- **Current Milestone:** MILESTONE 0 — Foundation
-- **Status:** Initial project setup in progress
+- **Current Milestone:** MILESTONE 2 — Kernel Foundation (in progress)
+- **Status:** Kernel subsystems implemented and building
 
 ### Subsystem Status
 
 | Subsystem | Status |
 |---|---|
-| Bootloader (UEFI) | Planned |
-| Bootloader (BIOS) | Planned |
-| Kernel | Planned |
-| Memory Management | Planned |
-| Process Scheduler | Planned |
+| Bootloader (UEFI) | Implemented and tested in QEMU |
+| Bootloader (BIOS) | Implemented and tested in QEMU |
+| Kernel Entry | Implemented |
+| Serial Output | Implemented |
+| GDT | Implemented |
+| IDT | Implemented |
+| Physical Memory Manager | Implemented |
+| Kernel Heap | Implemented |
+| Timer (PIT) | Implemented |
+| Keyboard (PS/2) | Implemented |
+| Framebuffer | Implemented |
+| Virtual Memory | Planned |
+| Scheduler | Planned |
+| System Calls | Planned |
 | Filesystem (KiKFS) | Planned |
 | Device Drivers | Planned |
 | Desktop Environment | Planned |
