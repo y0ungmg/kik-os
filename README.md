@@ -10,7 +10,7 @@ KiK OS is built from scratch. It is not a Linux distribution, desktop theme, web
 
 ## Development Status
 
-- **Current Milestone:** MILESTONE 2 — Kernel Foundation (in progress)
+- **Current Milestone:** MILESTONE 3-4 — Multitasking, Hardware and Storage (in progress)
 - **Status:** Kernel subsystems implemented and building
 
 ### Subsystem Status
@@ -28,11 +28,14 @@ KiK OS is built from scratch. It is not a Linux distribution, desktop theme, web
 | Timer (PIT) | Implemented |
 | Keyboard (PS/2) | Implemented |
 | Framebuffer | Implemented |
-| Virtual Memory | Planned |
-| Scheduler | Planned |
-| System Calls | Planned |
+| Virtual Memory | Implemented (basic) |
+| Scheduler | Implemented (basic) |
+| System Calls | Implemented (basic) |
+| IPC | Implemented (basic) |
+| Logging | Implemented |
+| PCI Enumeration | Implemented |
 | Filesystem (KiKFS) | Planned |
-| Device Drivers | Planned |
+| Device Drivers (storage) | Planned |
 | Desktop Environment | Planned |
 | Native Applications | Planned |
 | Networking | Planned |
