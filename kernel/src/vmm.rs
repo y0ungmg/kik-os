@@ -23,15 +23,26 @@ impl PageTable {
         Self { entries: [0; 512] }
     }
     
+    pub fn get_entry(&self, index: usize) -> u64 {
+        if index < 512 {
+            self.entries[index]
+        } else {
+            0
+        }
+    }
+    
+    pub fn set_entry(&mut self, index: usize, value: u64) {
+        if index < 512 {
+            self.entries[index] = value;
+        }
+    }
+    
     pub fn map(&mut self, virt: u64, phys: u64, flags: u64) {
         let pml4_idx = ((virt >> 39) & 0x1FF) as usize;
         let pdpt_idx = ((virt >> 30) & 0x1FF) as usize;
         let pd_idx = ((virt >> 21) & 0x1FF) as usize;
         let pt_idx = ((virt >> 12) & 0x1FF) as usize;
         
-        // For simplicity, we assume all intermediate tables exist
-        // In a real implementation, we'd allocate them
-        // This is a simplified version
         let _ = (pml4_idx, pdpt_idx, pd_idx, pt_idx, phys, flags);
     }
 }
