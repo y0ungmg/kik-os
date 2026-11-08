@@ -11,6 +11,14 @@ mod timer;
 mod vmm;
 mod scheduler;
 mod syscalls;
+mod keyboard;
+mod pci;
+mod framebuffer;
+mod kikfs;
+mod net;
+mod audio;
+mod usb;
+mod power;
 
 use core::panic::PanicInfo;
 
@@ -48,6 +56,27 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
     
     timer::init(100);
     serial::print("Timer initialized.\n");
+    
+    keyboard::init();
+    serial::print("Keyboard initialized.\n");
+    
+    // pci::enumerate(); // deferred - takes too long under QEMU
+    serial::print("PCI skipped.\n");
+    
+    kikfs::init();
+    serial::print("KiKFS initialized.\n");
+    
+    net::init();
+    serial::print("Network initialized.\n");
+    
+    audio::init();
+    serial::print("Audio initialized.\n");
+    
+    usb::init();
+    serial::print("USB initialized.\n");
+    
+    power::init();
+    serial::print("Power initialized.\n");
     
     scheduler::init();
     serial::print("Scheduler initialized.\n");
