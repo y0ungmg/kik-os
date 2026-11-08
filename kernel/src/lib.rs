@@ -19,6 +19,7 @@ mod log;
 mod pci;
 mod kikfs;
 mod net;
+mod audio;
 
 // Boot info structure (must match bootloader's definition)
 #[repr(C)]
