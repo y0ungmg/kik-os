@@ -9,6 +9,8 @@ mod pmm;
 mod heap;
 mod timer;
 mod vmm;
+mod scheduler;
+mod syscalls;
 
 use core::panic::PanicInfo;
 
@@ -47,7 +49,16 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
     timer::init(100);
     serial::print("Timer initialized.\n");
     
-    serial::print("VMM ready.\n");
+    scheduler::init();
+    serial::print("Scheduler initialized.\n");
+    
+    // Test syscall
+    let result = syscalls::handle_syscall(1, 1, 0, 0);
+    if result == 0 {
+        serial::print("Syscall test passed.\n");
+    }
+    
+    serial::print("Hello from KiK OS!\n");
 
     loop {
         unsafe {

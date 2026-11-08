@@ -40,7 +40,7 @@ pub enum TaskState {
     Terminated,
 }
 
-static mut TASKS: [Option<Task>; 64] = [None; 64];
+static mut TASKS: [Option<Task>; 1] = [None; 1];
 static mut TASK_COUNT: usize = 0;
 static mut CURRENT_TASK: usize = 0;
 static mut NEXT_TASK_ID: u64 = 1;
@@ -51,7 +51,7 @@ pub fn init() {
 
 pub fn create_task(entry_point: u64) -> Option<u64> {
     unsafe {
-        if TASK_COUNT >= 64 {
+        if TASK_COUNT >= 1 {
             return None;
         }
         
