@@ -10,7 +10,7 @@ NIGHTLY_RUSTC := /home/y0ungmg/.rustup/toolchains/nightly-2026-07-14-x86_64-unkn
 all: kernel uefi bios
 
 kernel:
-	RUSTC=$(NIGHTLY_RUSTC) $(NIGHTLY_CARGO) build --manifest-path kernel/Cargo.toml -Z build-std=core --target x86_64-unknown-none
+	RUSTC=$(NIGHTLY_RUSTC) RUSTFLAGS="-C link-arg=-Tkernel/linker.ld" $(NIGHTLY_CARGO) build --manifest-path kernel/Cargo.toml -Z build-std=core --target x86_64-unknown-none
 
 uefi:
 	RUSTC=$(NIGHTLY_RUSTC) $(NIGHTLY_CARGO) build --manifest-path boot/uefi/Cargo.toml -Z build-std=core,alloc --target x86_64-unknown-uefi

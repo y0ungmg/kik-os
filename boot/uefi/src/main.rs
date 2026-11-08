@@ -10,10 +10,8 @@ fn panic(_info: &PanicInfo) -> ! {
     loop {}
 }
 
-// Embed the kernel binary
 static KERNEL: &[u8] = include_bytes!("../../../target/x86_64-unknown-none/debug/kik-kernel");
 
-// ELF64 header
 #[repr(C)]
 struct Elf64Header {
     magic: [u8; 4],
@@ -52,35 +50,124 @@ struct Elf64ProgramHeader {
 
 const PT_LOAD: u32 = 1;
 
+#[repr(C)]
+pub struct BootInfo {
+    pub magic: u64,
+    pub kernel_load_addr: u64,
+    pub kernel_size: u64,
+    pub memory_map_addr: u64,
+    pub memory_map_count: u64,
+    pub framebuffer_addr: u64,
+    pub framebuffer_width: u32,
+    pub framebuffer_height: u32,
+    pub framebuffer_pitch: u32,
+    pub framebuffer_bpp: u8,
+    pub boot_mode: u8,
+}
+
 #[entry]
 fn main() -> Status {
     uefi::helpers::init().unwrap();
-    
+
     uefi::system::with_stdout(|stdout| {
         let _ = stdout.write_str("KiK Boot - UEFI\n");
         let _ = stdout.write_str("Loading KiK OS kernel...\n");
     });
-    
-    // Parse ELF header
+
     let elf_header = unsafe { &*(KERNEL.as_ptr() as *const Elf64Header) };
-    
-    // Verify ELF magic
+
     if elf_header.magic != [0x7F, b'E', b'L', b'F'] {
         uefi::system::with_stdout(|stdout| {
             let _ = stdout.write_str("Invalid ELF magic!\n");
         });
         loop {}
     }
-    
+
     uefi::system::with_stdout(|stdout| {
         let _ = stdout.write_str("ELF header valid.\n");
-        let _ = stdout.write_str("Entry point found.\n");
     });
-    
-    // In a real implementation, we'd:
-    // 1. Iterate through program headers
-    // 2. Load PT_LOAD segments into memory using boot services
-    // 3. Jump to entry point
-    // For now, just hang after validation
+
+    // Calculate total kernel size from ELF segments
+    let mut max_addr: u64 = 0x100000;
+    let phdr_base = unsafe { KERNEL.as_ptr().add(elf_header.phoff as usize) };
+    for i in 0..elf_header.phnum {
+        let phdr = unsafe {
+            &*(phdr_base.add(i as usize * elf_header.phentsize as usize) as *const Elf64ProgramHeader)
+        };
+        if phdr.p_type == PT_LOAD {
+            let end = phdr.p_vaddr + phdr.p_memsz;
+            if end > max_addr {
+                max_addr = end;
+            }
+        }
+    }
+    let kernel_pages = ((max_addr - 0x100000) as usize + 0xFFF) / 0x1000 + 1;
+
+    // Allocate memory at 0x100000 for the kernel
+    let alloc_result = uefi::boot::allocate_pages(
+        uefi::boot::AllocateType::Address(0x100000),
+        uefi::boot::MemoryType::LOADER_CODE,
+        kernel_pages,
+    );
+    uefi::system::with_stdout(|stdout| {
+        if alloc_result.is_ok() {
+            let _ = stdout.write_str("Memory allocated at 0x100000.\n");
+        } else {
+            let _ = stdout.write_str("Memory allocation failed!\n");
+        }
+    });
+
+    // Load PT_LOAD segments
+    let phdr_base = unsafe { KERNEL.as_ptr().add(elf_header.phoff as usize) };
+    for i in 0..elf_header.phnum {
+        let phdr = unsafe {
+            &*(phdr_base.add(i as usize * elf_header.phentsize as usize) as *const Elf64ProgramHeader)
+        };
+        if phdr.p_type == PT_LOAD {
+            let src = unsafe { KERNEL.as_ptr().add(phdr.p_offset as usize) };
+            let dst = phdr.p_vaddr as *mut u8;
+            unsafe {
+                core::ptr::copy_nonoverlapping(src, dst, phdr.p_filesz as usize);
+                if phdr.p_memsz > phdr.p_filesz {
+                    core::ptr::write_bytes(dst.add(phdr.p_filesz as usize), 0, (phdr.p_memsz - phdr.p_filesz) as usize);
+                }
+            }
+        }
+    }
+
+    uefi::system::with_stdout(|stdout| {
+        let _ = stdout.write_str("Kernel loaded at 0x100000.\n");
+    });
+
+    // Create BootInfo
+    let boot_info = BootInfo {
+        magic: 0x4B694B4F53, // "KiKOS"
+        kernel_load_addr: 0x100000,
+        kernel_size: KERNEL.len() as u64,
+        memory_map_addr: 0,
+        memory_map_count: 0,
+        framebuffer_addr: 0,
+        framebuffer_width: 0,
+        framebuffer_height: 0,
+        framebuffer_pitch: 0,
+        framebuffer_bpp: 0,
+        boot_mode: 1, // UEFI
+    };
+
+    let boot_info_ptr = &boot_info as *const BootInfo;
+
+    uefi::system::with_stdout(|stdout| {
+        let _ = write!(stdout, "Entry point: {:x}\n", elf_header.entry);
+        let _ = stdout.write_str("Jumping to kernel now...\n");
+    });
+
+    // Jump to kernel entry point
+    let entry: extern "C" fn(*const BootInfo) -> ! = unsafe {
+        core::mem::transmute(elf_header.entry)
+    };
+
+    entry(boot_info_ptr);
+
+    // Should never reach here
     loop {}
 }

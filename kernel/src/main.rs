@@ -47,52 +47,11 @@ pub struct BootInfo {
 #[unsafe(no_mangle)]
 pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
     serial::init();
-    serial::print("KiK OS kernel starting...\n");
-    
     gdt::init();
-    serial::print("GDT initialized.\n");
-    
     idt::init();
-    serial::print("IDT initialized.\n");
-    
     pmm::init(128 * 1024 * 1024);
-    serial::print("PMM initialized.\n");
-    
     heap::init();
-    serial::print("Heap initialized.\n");
     
-    timer::init(100);
-    serial::print("Timer initialized.\n");
-    
-    keyboard::init();
-    serial::print("Keyboard initialized.\n");
-    
-    pci::enumerate();
-    serial::print("PCI enumerated.\n");
-    
-    kikfs::init();
-    serial::print("KiKFS initialized.\n");
-    
-    net::init();
-    serial::print("Network initialized.\n");
-    
-    audio::init();
-    serial::print("Audio initialized.\n");
-    
-    usb::init();
-    serial::print("USB initialized.\n");
-    
-    power::init();
-    serial::print("Power management initialized.\n");
-    
-    users::init();
-    serial::print("User management initialized.\n");
-    
-    scheduler::init();
-    serial::print("Scheduler initialized.\n");
-    
-    serial::print("Hello from KiK OS!\n");
-
     loop {
         unsafe {
             core::arch::asm!("hlt");
