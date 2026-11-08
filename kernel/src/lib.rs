@@ -11,6 +11,7 @@ mod heap;
 mod timer;
 mod keyboard;
 mod framebuffer;
+mod vmm;
 
 // Boot info structure (must match bootloader's definition)
 #[repr(C)]
