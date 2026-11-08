@@ -13,6 +13,7 @@ mod keyboard;
 mod framebuffer;
 mod vmm;
 mod scheduler;
+mod syscalls;
 
 // Boot info structure (must match bootloader's definition)
 #[repr(C)]
