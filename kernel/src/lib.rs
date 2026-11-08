@@ -23,6 +23,7 @@ mod audio;
 mod usb;
 mod power;
 mod users;
+mod context_switch;
 
 // Boot info structure (must match bootloader's definition)
 #[repr(C)]
