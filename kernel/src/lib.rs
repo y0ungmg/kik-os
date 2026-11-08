@@ -16,6 +16,7 @@ mod scheduler;
 mod syscalls;
 mod ipc;
 mod log;
+mod pci;
 
 // Boot info structure (must match bootloader's definition)
 #[repr(C)]
