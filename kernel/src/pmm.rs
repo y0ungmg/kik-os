@@ -10,8 +10,6 @@ static mut TOTAL_PAGES: usize = 0;
 static mut FREE_PAGES: usize = 0;
 
 pub fn init(total_memory_bytes: usize) {
-    // Deferred under UEFI - static BITMAP writes cause issues
-    // Just set counters
     unsafe {
         TOTAL_PAGES = total_memory_bytes / PAGE_SIZE;
         FREE_PAGES = TOTAL_PAGES;

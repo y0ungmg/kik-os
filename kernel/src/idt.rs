@@ -20,7 +20,7 @@ pub struct IdtPointer {
     pub base: u64,
 }
 
-const IDT_ENTRIES: usize = 256;
+const IDT_ENTRIES: usize = 1;
 
 static mut IDT: [IdtEntry; IDT_ENTRIES] = [IdtEntry {
     offset_low: 0,
@@ -41,6 +41,33 @@ extern "C" fn exception_handler() {
 }
 
 pub fn init() {
-    // Deferred: IDT setup causes issues under UEFI
-    // Just return for now
+    // Set up exception handlers (0-31)
+    for i in 0..IDT_ENTRIES {
+        let handler_addr = exception_handler as u64;
+        unsafe {
+            IDT[i].offset_low = (handler_addr & 0xFFFF) as u16;
+            IDT[i].selector = 0x08;
+            IDT[i].ist = 0;
+            IDT[i].type_attr = 0x8E;
+            IDT[i].offset_mid = ((handler_addr >> 16) & 0xFFFF) as u16;
+            IDT[i].offset_high = (handler_addr >> 32) as u32;
+            IDT[i].reserved = 0;
+        }
+    }
+    
+    let idt_ptr = IdtPointer {
+        limit: (size_of::<[IdtEntry; IDT_ENTRIES]>() - 1) as u16,
+        base: &raw const IDT as *const _ as u64,
+    };
+    
+    // Don't load IDT yet
+    /*
+    unsafe {
+        core::arch::asm!(
+            "lidt [{}]",
+            in(reg) &idt_ptr,
+            options(nostack)
+        );
+    }
+    */
 }

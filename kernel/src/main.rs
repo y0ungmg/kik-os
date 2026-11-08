@@ -1,31 +1,12 @@
 // Kernel binary entry point
-// This is linked with the kernel library
-
 #![no_std]
 #![no_main]
 
-// Re-export kernel modules
 mod serial;
 mod gdt;
 mod idt;
 mod pmm;
 mod heap;
-mod timer;
-mod keyboard;
-mod framebuffer;
-mod vmm;
-mod scheduler;
-mod syscalls;
-mod ipc;
-mod log;
-mod pci;
-mod kikfs;
-mod net;
-mod audio;
-mod usb;
-mod power;
-mod users;
-mod context_switch;
 
 use core::panic::PanicInfo;
 
@@ -52,8 +33,8 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
     gdt::init();
     serial::print("GDT initialized.\n");
     
-    idt::init();
-    serial::print("IDT initialized.\n");
+    // idt::init(); // deferred
+    serial::print("Skipping IDT.\n");
     
     pmm::init(128 * 1024 * 1024);
     serial::print("PMM initialized.\n");

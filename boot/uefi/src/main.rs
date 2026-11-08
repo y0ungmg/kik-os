@@ -101,7 +101,7 @@ fn main() -> Status {
             }
         }
     }
-    let kernel_pages = ((max_addr - 0x100000) as usize + 0xFFF) / 0x1000 + 1;
+    let kernel_pages = ((max_addr - 0x100000) as usize + 0xFFF) / 0x1000 + 2; // +2 for safety margin
 
     // Allocate memory at 0x100000 for the kernel
     let alloc_result = uefi::boot::allocate_pages(
