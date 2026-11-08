@@ -1,0 +1,14 @@
+[workspace]
+
+[package]
+name = "kik-compositor"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+name = "kik_compositor"
+
+[dependencies]
+
+[profile.dev]
+panic = "abort"
