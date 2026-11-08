@@ -4,6 +4,7 @@
 use core::panic::PanicInfo;
 
 mod serial;
+mod gdt;
 
 // Boot info structure (must match bootloader's definition)
 #[repr(C)]
@@ -25,6 +26,10 @@ pub struct BootInfo {
 pub extern "C" fn _start(boot_info: *const BootInfo) -> ! {
     serial::init();
     serial::print("KiK OS kernel starting...\n");
+    
+    // Initialize GDT
+    gdt::init();
+    serial::print("GDT initialized.\n");
     
     if !boot_info.is_null() {
         let bi = unsafe { &*boot_info };
