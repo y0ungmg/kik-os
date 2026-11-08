@@ -10,8 +10,8 @@ KiK OS is built from scratch. It is not a Linux distribution, desktop theme, web
 
 ## Development Status
 
-- **Current Milestone:** MILESTONE 3-4 — Multitasking, Hardware and Storage (in progress)
-- **Status:** Kernel subsystems implemented and building
+- **Current Milestone:** MILESTONE 4-5 — Hardware, Storage, and User Space (in progress)
+- **Status:** Kernel subsystems implemented and building. Userland started.
 
 ### Subsystem Status
 
@@ -34,8 +34,9 @@ KiK OS is built from scratch. It is not a Linux distribution, desktop theme, web
 | IPC | Implemented (basic) |
 | Logging | Implemented |
 | PCI Enumeration | Implemented |
-| Filesystem (KiKFS) | Planned |
-| Device Drivers (storage) | Planned |
+| KiKFS Filesystem | Implemented (structure) |
+| Init Process | Implemented |
+| Shell | Implemented (basic) |
 | Desktop Environment | Planned |
 | Native Applications | Planned |
 | Networking | Planned |
