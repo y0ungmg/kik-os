@@ -5,6 +5,7 @@ use core::panic::PanicInfo;
 
 mod serial;
 mod gdt;
+mod idt;
 
 // Boot info structure (must match bootloader's definition)
 #[repr(C)]
@@ -30,6 +31,10 @@ pub extern "C" fn _start(boot_info: *const BootInfo) -> ! {
     // Initialize GDT
     gdt::init();
     serial::print("GDT initialized.\n");
+    
+    // Initialize IDT
+    idt::init();
+    serial::print("IDT initialized.\n");
     
     if !boot_info.is_null() {
         let bi = unsafe { &*boot_info };
