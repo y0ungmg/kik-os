@@ -12,6 +12,7 @@ mod timer;
 mod keyboard;
 mod framebuffer;
 mod vmm;
+mod scheduler;
 
 // Boot info structure (must match bootloader's definition)
 #[repr(C)]
@@ -57,6 +58,13 @@ pub extern "C" fn _start(boot_info: *const BootInfo) -> ! {
     // Initialize keyboard
     keyboard::init();
     serial::print("Keyboard initialized.\n");
+    
+    // Initialize VMM
+    // vmm::init(); // Placeholder
+    
+    // Initialize scheduler
+    scheduler::init();
+    serial::print("Scheduler initialized.\n");
     
     if !boot_info.is_null() {
         let bi = unsafe { &*boot_info };
