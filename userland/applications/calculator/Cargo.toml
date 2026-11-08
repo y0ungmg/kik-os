@@ -1,0 +1,16 @@
+[workspace]
+
+[package]
+name = "kik-calculator"
+version = "0.1.0"
+edition = "2024"
+
+[[bin]]
+name = "kik-calculator"
+path = "src/main.rs"
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
