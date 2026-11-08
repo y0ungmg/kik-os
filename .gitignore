@@ -1,0 +1,36 @@
+# KiK OS — Build artifacts
+build/
+releases/*.iso
+releases/*.img
+*.o
+*.obj
+*.bin
+*.elf
+*.a
+*.so
+*.dylib
+target/
+
+# Rust
+Cargo.lock
+**/target/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.log
+*.bak
+
+# Secrets
+.env
+.env.local
