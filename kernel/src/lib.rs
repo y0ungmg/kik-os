@@ -7,6 +7,7 @@ mod serial;
 mod gdt;
 mod idt;
 mod pmm;
+mod heap;
 
 // Boot info structure (must match bootloader's definition)
 #[repr(C)]
@@ -40,6 +41,10 @@ pub extern "C" fn _start(boot_info: *const BootInfo) -> ! {
     // Initialize PMM (128MB default)
     pmm::init(128 * 1024 * 1024);
     serial::print("PMM initialized.\n");
+    
+    // Initialize heap
+    heap::init();
+    serial::print("Heap initialized.\n");
     
     if !boot_info.is_null() {
         let bi = unsafe { &*boot_info };
