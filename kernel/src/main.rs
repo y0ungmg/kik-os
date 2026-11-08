@@ -35,8 +35,8 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
     gdt::init();
     serial::print("GDT initialized.\n");
     
-    // idt::init(); // deferred
-    serial::print("Skipping IDT.\n");
+    idt::init();
+    serial::print("IDT initialized.\n");
     
     pmm::init(128 * 1024 * 1024);
     serial::print("PMM initialized.\n");
