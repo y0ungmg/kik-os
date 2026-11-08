@@ -47,10 +47,8 @@ pub struct BootInfo {
 #[unsafe(no_mangle)]
 pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
     serial::init();
-    gdt::init();
-    idt::init();
-    pmm::init(128 * 1024 * 1024);
-    heap::init();
+    serial::print("KiK OS kernel starting...\n");
+    serial::print("Hello from KiK OS!\n");
     
     loop {
         unsafe {

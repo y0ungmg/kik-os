@@ -106,7 +106,7 @@ fn main() -> Status {
     // Allocate memory at 0x100000 for the kernel
     let alloc_result = uefi::boot::allocate_pages(
         uefi::boot::AllocateType::Address(0x100000),
-        uefi::boot::MemoryType::LOADER_CODE,
+        uefi::boot::MemoryType::LOADER_DATA,
         kernel_pages,
     );
     uefi::system::with_stdout(|stdout| {

@@ -22,12 +22,15 @@ pub fn init() {
 }
 
 pub fn print(s: &str) {
-    for byte in s.bytes() {
-        write_byte(byte);
+    let bytes = s.as_bytes();
+    let mut i = 0;
+    while i < bytes.len() {
+        write_byte(bytes[i]);
+        i += 1;
     }
 }
 
-fn write_byte(byte: u8) {
+pub fn write_byte(byte: u8) {
     unsafe {
         // Wait for transmit buffer to be empty
         while inb(COM1 + 5) & 0x20 == 0 {}
