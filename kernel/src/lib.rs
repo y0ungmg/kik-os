@@ -14,6 +14,7 @@ mod framebuffer;
 mod vmm;
 mod scheduler;
 mod syscalls;
+mod ipc;
 
 // Boot info structure (must match bootloader's definition)
 #[repr(C)]
