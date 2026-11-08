@@ -1,0 +1,14 @@
+[workspace]
+
+[package]
+name = "kik-shell-desktop"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+name = "kik_shell_desktop"
+
+[dependencies]
+
+[profile.dev]
+panic = "abort"
