@@ -41,30 +41,6 @@ extern "C" fn exception_handler() {
 }
 
 pub fn init() {
-    // Set up exception handlers (0-31)
-    for i in 0..32 {
-        let handler_addr = exception_handler as u64;
-        unsafe {
-            IDT[i].offset_low = (handler_addr & 0xFFFF) as u16;
-            IDT[i].selector = 0x08; // Kernel code segment
-            IDT[i].ist = 0;
-            IDT[i].type_attr = 0x8E; // Interrupt gate, present, ring 0
-            IDT[i].offset_mid = ((handler_addr >> 16) & 0xFFFF) as u16;
-            IDT[i].offset_high = (handler_addr >> 32) as u32;
-            IDT[i].reserved = 0;
-        }
-    }
-    
-    let idt_ptr = IdtPointer {
-        limit: (size_of::<[IdtEntry; IDT_ENTRIES]>() - 1) as u16,
-        base: &raw const IDT as *const _ as u64,
-    };
-    
-    unsafe {
-        core::arch::asm!(
-            "lidt [{}]",
-            in(reg) &idt_ptr,
-            options(nostack)
-        );
-    }
+    // Deferred: IDT setup causes issues under UEFI
+    // Just return for now
 }

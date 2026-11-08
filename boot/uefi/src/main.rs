@@ -135,8 +135,57 @@ fn main() -> Status {
         }
     }
 
+    // Set up identity-mapped page tables (2MB pages, 0-4GB)
+    // Allocate 8 pages for page tables
+    let pt_pages = uefi::boot::allocate_pages(
+        uefi::boot::AllocateType::AnyPages,
+        uefi::boot::MemoryType::LOADER_DATA,
+        8,
+    ).unwrap();
+    let pt_base = pt_pages.as_ptr() as usize;
+    
+    // Zero all pages
+    unsafe { core::ptr::write_bytes(pt_base as *mut u8, 0, 8 * 4096); }
+    
+    // PML4 at offset 0
+    let pml4 = pt_base as *mut u64;
+    // PDPT at offset 1 page
+    let pdpt = (pt_base + 4096) as *mut u64;
+    // 4 PDs at offsets 2-5
+    let pd0 = (pt_base + 2 * 4096) as *mut u64;
+    let pd1 = (pt_base + 3 * 4096) as *mut u64;
+    let pd2 = (pt_base + 4 * 4096) as *mut u64;
+    let pd3 = (pt_base + 5 * 4096) as *mut u64;
+    
+    // PML4[0] -> PDPT
+    unsafe { *pml4 = (pt_base + 4096) as u64 | 0x03; } // present + writable
+    
+    // PDPT[0..4] -> PDs
+    unsafe {
+        *pdpt.add(0) = (pt_base + 2 * 4096) as u64 | 0x03;
+        *pdpt.add(1) = (pt_base + 3 * 4096) as u64 | 0x03;
+        *pdpt.add(2) = (pt_base + 4 * 4096) as u64 | 0x03;
+        *pdpt.add(3) = (pt_base + 5 * 4096) as u64 | 0x03;
+    }
+    
+    // Each PD: 512 entries of 2MB pages (present + writable + huge)
+    for i in 0..4usize {
+        let pd = match i {
+            0 => pd0, 1 => pd1, 2 => pd2, _ => pd3,
+        };
+        for j in 0..512usize {
+            let addr = (i * 0x40000000 + j * 0x200000) as u64;
+            unsafe { *pd.add(j) = addr | 0x83; } // present + writable + huge (2MB)
+        }
+    }
+    
+    // Load CR3
+    unsafe {
+        core::arch::asm!("mov cr3, {}", in(reg) pt_base as u64, options(nostack));
+    }
+    
     uefi::system::with_stdout(|stdout| {
-        let _ = stdout.write_str("Kernel loaded at 0x100000.\n");
+        let _ = stdout.write_str("Page tables set up.\n");
     });
 
     // Create BootInfo

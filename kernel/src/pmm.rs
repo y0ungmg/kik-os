@@ -10,19 +10,11 @@ static mut TOTAL_PAGES: usize = 0;
 static mut FREE_PAGES: usize = 0;
 
 pub fn init(total_memory_bytes: usize) {
+    // Deferred under UEFI - static BITMAP writes cause issues
+    // Just set counters
     unsafe {
         TOTAL_PAGES = total_memory_bytes / PAGE_SIZE;
         FREE_PAGES = TOTAL_PAGES;
-        // Mark all pages as free (0 = free in our bitmap, 1 = used)
-        for i in 0..(TOTAL_PAGES / 64 + 1) {
-            BITMAP[i] = 0;
-        }
-        // Mark first 1MB as used (kernel, bootloader, etc.)
-        let reserved_pages = 0x100000 / PAGE_SIZE;
-        for i in 0..reserved_pages {
-            set_page_used(i);
-            FREE_PAGES -= 1;
-        }
     }
 }
 

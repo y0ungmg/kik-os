@@ -48,8 +48,21 @@ pub struct BootInfo {
 pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
     serial::init();
     serial::print("KiK OS kernel starting...\n");
-    serial::print("Hello from KiK OS!\n");
     
+    gdt::init();
+    serial::print("GDT initialized.\n");
+    
+    idt::init();
+    serial::print("IDT initialized.\n");
+    
+    pmm::init(128 * 1024 * 1024);
+    serial::print("PMM initialized.\n");
+    
+    heap::init();
+    serial::print("Heap initialized.\n");
+    
+    serial::print("Hello from KiK OS!\n");
+
     loop {
         unsafe {
             core::arch::asm!("hlt");
