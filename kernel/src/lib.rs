@@ -8,6 +8,7 @@ mod gdt;
 mod idt;
 mod pmm;
 mod heap;
+mod timer;
 
 // Boot info structure (must match bootloader's definition)
 #[repr(C)]
@@ -45,6 +46,10 @@ pub extern "C" fn _start(boot_info: *const BootInfo) -> ! {
     // Initialize heap
     heap::init();
     serial::print("Heap initialized.\n");
+    
+    // Initialize timer (100 Hz)
+    timer::init(100);
+    serial::print("Timer initialized.\n");
     
     if !boot_info.is_null() {
         let bi = unsafe { &*boot_info };
