@@ -3,6 +3,10 @@ name = "kik-kernel"
 version = "0.1.0"
 edition = "2024"
 
+[[bin]]
+name = "kik-kernel"
+path = "src/main.rs"
+
 [lib]
 crate-type = ["staticlib"]
 name = "kik_kernel"
