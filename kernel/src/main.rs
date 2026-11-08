@@ -8,6 +8,7 @@ mod idt;
 mod pmm;
 mod heap;
 mod timer;
+mod vmm;
 
 use core::panic::PanicInfo;
 
@@ -46,7 +47,7 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
     timer::init(100);
     serial::print("Timer initialized.\n");
     
-    serial::print("Hello from KiK OS!\n");
+    serial::print("VMM ready.\n");
 
     loop {
         unsafe {
