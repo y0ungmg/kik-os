@@ -10,6 +10,7 @@ mod pmm;
 mod heap;
 mod timer;
 mod keyboard;
+mod framebuffer;
 
 // Boot info structure (must match bootloader's definition)
 #[repr(C)]
