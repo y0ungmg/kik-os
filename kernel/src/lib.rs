@@ -21,6 +21,7 @@ mod kikfs;
 mod net;
 mod audio;
 mod usb;
+mod power;
 
 // Boot info structure (must match bootloader's definition)
 #[repr(C)]
