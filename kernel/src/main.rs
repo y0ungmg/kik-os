@@ -138,14 +138,8 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
     
     // Draw window on framebuffer (info from bootloader at 0x9000)
     let bi_ptr = 0x9000 as *const BootInfo;
-    let (fb_addr, fb_pitch) = unsafe {
-        if !bi_ptr.is_null() {
-            let bi = &*bi_ptr;
-            (bi.framebuffer_addr, bi.framebuffer_pitch)
-        } else {
-            (0x80000000u64, 5120u32)
-        }
-    };
+    let fb_addr = unsafe { (*bi_ptr).framebuffer_addr };
+    let fb_pitch = unsafe { (*bi_ptr).framebuffer_pitch };
     // Create compositor with framebuffer
     let fb = framebuffer::Framebuffer::new(fb_addr, 1280, 800, fb_pitch, 32);
     let mut comp = compositor::Compositor::new(fb);
@@ -180,14 +174,32 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
             if let Some(c) = keyboard::get_char() {
                 if c == 13 { // Enter
                     serial::print("\n");
-                    // Echo back the line
-                    serial::print("You typed: ");
-                    let mut i = 0;
-                    while i < input_pos {
-                        serial::write_byte(input_line[i]);
-                        i += 1;
+                    // Process command
+                    let mut cmd = [0u8; 128];
+                    let mut ci = 0;
+                    while ci < input_pos {
+                        cmd[ci] = input_line[ci];
+                        ci += 1;
                     }
-                    serial::print("\n> ");
+                    cmd[ci] = 0; // null terminate
+                    // Simple command processing
+                    if input_pos == 0 {
+                        // Empty line
+                    } else if input_line[0] == b'h' && input_line[1] == b'e' && input_line[2] == b'l' && input_line[3] == b'p' {
+                        serial::print("KiK OS Shell Commands:\n");
+                        serial::print("  help   - show this help\n");
+                        serial::print("  clear  - clear screen\n");
+                        serial::print("  ver    - show version\n");
+                        serial::print("  echo   - echo text\n");
+                    } else if input_line[0] == b'v' && input_line[1] == b'e' && input_line[2] == b'r' {
+                        serial::print("KiK OS v0.1.0 - Bare metal Rust kernel\n");
+                    } else if input_line[0] == b'c' && input_line[1] == b'l' && input_line[2] == b'e' && input_line[3] == b'a' && input_line[4] == b'r' {
+                        // Clear screen (ANSI escape)
+                        serial::print("\x1B[2J\x1B[H");
+                    } else {
+                        serial::print("Unknown command. Type 'help' for commands.\n");
+                    }
+                    serial::print("> ");
                     input_pos = 0;
                 } else if c == 8 { // Backspace
                     if input_pos > 0 {
