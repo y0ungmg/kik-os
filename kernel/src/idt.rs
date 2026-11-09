@@ -20,7 +20,7 @@ pub struct IdtPointer {
     pub base: u64,
 }
 
-const IDT_ENTRIES: usize = 32;
+const IDT_ENTRIES: usize = 48; // 32 exceptions + 16 IRQs
 
 static mut IDT: [IdtEntry; IDT_ENTRIES] = [IdtEntry {
     offset_low: 0,

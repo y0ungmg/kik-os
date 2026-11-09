@@ -23,6 +23,7 @@ mod power;
 mod ipc;
 mod tss;
 mod usermode;
+mod pic;
 mod process;
 mod users;
 
@@ -53,6 +54,9 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
     
     idt::init();
     serial::print("IDT initialized.\n");
+    
+    pic::init();
+    serial::print("PIC initialized.\n");
     
     pmm::init(1024 * 1024); // 1MB (reduced for UEFI static-write compat)
     serial::print("PMM initialized.\n");
