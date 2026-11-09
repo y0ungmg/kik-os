@@ -19,6 +19,7 @@ mod net;
 mod audio;
 mod usb;
 mod power;
+mod ipc;
 mod users;
 
 use core::panic::PanicInfo;
@@ -96,6 +97,18 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
         pmm::free_page(page);
     } else {
         serial::print("PMM alloc_page returned 0!\n");
+    }
+    
+    // Test IPC
+    let msg = ipc::Message {
+        sender: 1,
+        receiver: 2,
+        msg_type: 0,
+        size: 0,
+        data: [0; 64],
+    };
+    if ipc::send_message(msg) {
+        serial::print("IPC send test passed.\n");
     }
     
     // Test syscalls

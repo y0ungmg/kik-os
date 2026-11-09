@@ -1,7 +1,7 @@
 // Inter-Process Communication (IPC) - simple message passing
 
-pub const MAX_MESSAGES: usize = 256;
-pub const MAX_MESSAGE_SIZE: usize = 256;
+pub const MAX_MESSAGES: usize = 4;
+pub const MAX_MESSAGE_SIZE: usize = 64;
 
 #[derive(Clone, Copy)]
 #[repr(C)]
@@ -37,22 +37,26 @@ pub fn receive_message(receiver: u64) -> Option<Message> {
         }
         
         // Find message for this receiver
-        for i in 0..QUEUE_COUNT {
+        let mut i = 0;
+        while i < QUEUE_COUNT {
             let idx = (QUEUE_HEAD + i) % MAX_MESSAGES;
             if let Some(ref msg) = MESSAGE_QUEUE[idx] {
                 if msg.receiver == receiver {
                     let msg = MESSAGE_QUEUE[idx].take().unwrap();
                     // Shift remaining messages
-                    for j in i..QUEUE_COUNT - 1 {
+                    let mut j = i;
+                    while j < QUEUE_COUNT - 1 {
                         let src = (QUEUE_HEAD + j + 1) % MAX_MESSAGES;
                         let dst = (QUEUE_HEAD + j) % MAX_MESSAGES;
                         MESSAGE_QUEUE[dst] = MESSAGE_QUEUE[src].take();
+                        j += 1;
                     }
                     QUEUE_TAIL = (QUEUE_TAIL + MAX_MESSAGES - 1) % MAX_MESSAGES;
                     QUEUE_COUNT -= 1;
                     return Some(msg);
                 }
             }
+            i += 1;
         }
         None
     }
