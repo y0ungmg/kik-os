@@ -81,8 +81,8 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
     keyboard::init();
     serial::print("Keyboard initialized.\n");
     
-    // pci::enumerate(); // deferred - takes too long under QEMU
-    serial::print("PCI skipped.\n");
+    pci::enumerate();
+    serial::print("PCI enumeration done.\n");
     
     kikfs::init();
     serial::print("KiKFS initialized.\n");

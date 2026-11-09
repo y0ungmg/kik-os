@@ -30,17 +30,23 @@ pub fn read_config_dword(bus: u8, slot: u8, func: u8, offset: u8) -> u32 {
 }
 
 pub fn enumerate() {
-    for bus in 0..=255u8 {
-        for slot in 0..32u8 {
-            let vendor_id = read_config_word(bus, slot, 0, 0);
-            if vendor_id != 0xFFFF {
-                let device_id = read_config_word(bus, slot, 0, 2);
-                let class_code = read_config_dword(bus, slot, 0, 8) >> 24;
-                let _ = (device_id, class_code);
-                // In a real implementation, we'd store these
-            }
+    crate::serial::print("PCI: starting enumeration...\n");
+    // Only check slot 0, 1, ... with a simple loop
+    let mut slot = 0u8;
+    while slot < 32 {
+        let vendor_id = read_config_word(0, slot, 0, 0);
+        if vendor_id != 0xFFFF {
+            crate::serial::print("PCI: found device at slot ");
+            let hi = (slot >> 4) & 0x0F;
+            let lo = slot & 0x0F;
+            let hex_chars = b"0123456789ABCDEF";
+            crate::serial::write_byte(hex_chars[hi as usize]);
+            crate::serial::write_byte(hex_chars[lo as usize]);
+            crate::serial::print("\n");
         }
+        slot += 1;
     }
+    crate::serial::print("PCI: enumeration complete.\n");
 }
 
 unsafe fn outl(port: u16, value: u32) {
