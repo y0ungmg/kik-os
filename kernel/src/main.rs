@@ -27,6 +27,7 @@ mod usermode;
 mod pic;
 mod process;
 mod window;
+mod compositor;
 mod users;
 
 use core::panic::PanicInfo;
@@ -145,9 +146,14 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
             (0x80000000u64, 5120u32)
         }
     };
-    let win = window::Window::new(100, 100, 50, 30, "KiK Window");
-    win.draw(fb_addr, fb_pitch);
-    serial::print("Window drawn on framebuffer.\n");
+    // Create compositor with framebuffer
+    let fb = framebuffer::Framebuffer::new(fb_addr, 1280, 800, fb_pitch, 32);
+    let mut comp = compositor::Compositor::new(fb);
+    // Add two windows
+    comp.add_window(window::Window::new(50, 50, 100, 80, "Window 1"));
+    comp.add_window(window::Window::new(200, 80, 120, 90, "Window 2"));
+    comp.draw_all();
+    serial::print("Compositor: 2 windows drawn.\n");
     
     // Test process management
     let pid = process::create_process(0x1000);

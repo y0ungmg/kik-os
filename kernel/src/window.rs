@@ -1,5 +1,6 @@
 // Simple window manager
 
+#[derive(Clone, Copy)]
 pub struct Window {
     pub x: u32,
     pub y: u32,
