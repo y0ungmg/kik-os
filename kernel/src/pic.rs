@@ -27,9 +27,10 @@ pub fn init() {
         outb(PIC1_DATA, 0x01);
         outb(PIC2_DATA, 0x01);
         
-        // Restore masks (mask all IRQs - enable later when handlers are ready)
-        outb(PIC1_DATA, 0xFF);
-        outb(PIC2_DATA, 0xFF);
+        // Unmask timer IRQ (IRQ0)
+        unsafe {
+            outb(PIC1_DATA, 0xFE); // Enable only IRQ0
+        }
     }
 }
 pub fn send_eoi(irq: u8) {

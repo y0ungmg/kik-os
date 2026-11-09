@@ -38,10 +38,23 @@ extern "C" fn exception_handler() {
     }
 }
 
+extern "C" fn irq_handler() {
+    // Timer IRQ (IRQ0)
+    // Send EOI
+    unsafe {
+        // EOI to PIC1
+        core::arch::asm!("out 0x20, al", in("al") 0x20u8, options(nomem, nostack));
+    }
+}
+
 pub fn init() {
     let mut i = 0;
     while i < IDT_ENTRIES {
-        let handler_addr = exception_handler as u64;
+        let handler_addr = if i < 32 {
+            exception_handler as u64
+        } else {
+            irq_handler as u64
+        };
         unsafe {
             IDT[i].offset_low = (handler_addr & 0xFFFF) as u16;
             IDT[i].selector = 0x08;

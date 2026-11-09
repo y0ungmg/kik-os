@@ -9,10 +9,8 @@ pub fn init(frequency: u32) {
     let divisor = 1193182 / frequency;
     
     unsafe {
-        // Channel 0, lobyte/hibyte, rate generator
-        outb(PIT_COMMAND, 0x36);
-        outb(PIT_CHANNEL0, (divisor & 0xFF) as u8);
-        outb(PIT_CHANNEL0, ((divisor >> 8) & 0xFF) as u8);
+        core::arch::asm!("out 0x43, al", in("al") 0x36u8, options(nomem, nostack));
+        core::arch::asm!("out 0x40, al", in("al") (divisor & 0xFF) as u8, options(nomem, nostack));
     }
 }
 
@@ -25,12 +23,10 @@ pub fn increment_ticks() {
 }
 
 unsafe fn outb(port: u16, value: u8) {
-    unsafe {
-        core::arch::asm!(
-            "out dx, al",
-            in("dx") port,
-            in("al") value,
-            options(nomem, nostack, preserves_flags)
-        );
-    }
+    core::arch::asm!(
+        "out dx, al",
+        in("dx") port,
+        in("al") value,
+        options(nomem, nostack)
+    );
 }
