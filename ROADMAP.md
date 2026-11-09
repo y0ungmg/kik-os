@@ -66,9 +66,12 @@
 ## MILESTONE 6 — Graphics (IN PROGRESS)
 - Framebuffer driver: working ✓ (set_pixel, clear)
 - Window manager: Window struct with draw (background + title bar) ✓
-- Compositor: multi-window with z-ordering, draw_all ✓
+- Compositor: multi-window with z-ordering, draw_all, taskbar ✓
 - 2 windows drawn on UEFI GOP framebuffer ✓
-- Desktop environment: not yet
+- Desktop environment: basic (taskbar + windows) ✓
+- Keyboard input: scancode-to-ASCII, circular buffer ✓
+- Interactive shell: help, ver, clear commands ✓
+- VMM: 4-level page table management, map/unmap/translate, CR3 switching ✓
 ## MILESTONE 7 — Desktop Applications (PLANNED)
 ## MILESTONE 8 — Advanced Functionality (PLANNED)
 ## MILESTONE 9 — Release Engineering (PLANNED)
