@@ -34,13 +34,27 @@ impl Compositor {
     }
 
     pub fn draw_all(&mut self) {
-        // Draw windows only (background is already set by framebuffer init)
+        // Draw windows
         let mut i = 0usize;
         while i < self.window_count {
             if let Some(ref win) = self.windows[i] {
                 win.draw(self.fb.address, self.fb.pitch);
             }
             i += 1;
+        }
+    
+        // Draw mouse cursor (simple arrow at fixed position for now)
+        let cx = 400u32;
+        let cy = 300u32;
+        let mut ci = 0u32;
+        while ci < 10 {
+            self.fb.set_pixel(cx + ci, cy + ci, 0x00FFFFFF);
+            ci += 1;
+        }
+        let mut cj = 0u32;
+        while cj < 10 {
+            self.fb.set_pixel(cx, cy + cj, 0x00FFFFFF);
+            cj += 1;
         }
     }
 
