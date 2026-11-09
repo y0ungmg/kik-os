@@ -167,24 +167,43 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
     }
     
     serial::print("Hello from KiK OS!\n");
+    serial::print("> ");
     
     // User mode tested successfully (prints 'U' to serial) - see user_main()
     // Uncomment to test: usermode::switch_to_user_mode(user_main as u64, 0x300000);
     
     // Main loop - check for keyboard input
-    let mut last = 0u8;
+    let mut input_line = [0u8; 128];
+    let mut input_pos = 0usize;
     loop {
-        let sc = idt::get_last_scancode();
-        if sc != 0 && sc != last {
-            last = sc;
-            // Print scancode as hex
-            serial::print("Key: ");
-            let hi = (sc >> 4) & 0x0F;
-            let lo = sc & 0x0F;
-            let hex_chars = b"0123456789ABCDEF";
-            serial::write_byte(hex_chars[hi as usize]);
-            serial::write_byte(hex_chars[lo as usize]);
-            serial::print("\n");
+        if keyboard::has_input() {
+            if let Some(c) = keyboard::get_char() {
+                if c == 13 { // Enter
+                    serial::print("\n");
+                    // Echo back the line
+                    serial::print("You typed: ");
+                    let mut i = 0;
+                    while i < input_pos {
+                        serial::write_byte(input_line[i]);
+                        i += 1;
+                    }
+                    serial::print("\n> ");
+                    input_pos = 0;
+                } else if c == 8 { // Backspace
+                    if input_pos > 0 {
+                        input_pos -= 1;
+                        serial::write_byte(8);
+                        serial::write_byte(b' ');
+                        serial::write_byte(8);
+                    }
+                } else {
+                    if input_pos < 127 {
+                        input_line[input_pos] = c;
+                        input_pos += 1;
+                        serial::write_byte(c);
+                    }
+                }
+            }
         }
         unsafe {
             core::arch::asm!("hlt");

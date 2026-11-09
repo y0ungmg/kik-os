@@ -52,6 +52,8 @@ extern "C" fn irq_handler() {
             let scancode: u8;
             core::arch::asm!("in al, 0x60", out("al") scancode, options(nomem, nostack));
             LAST_SCANCODE = scancode;
+            // Process scancode in keyboard driver
+            crate::keyboard::process_scancode(scancode);
         }
         // EOI to PIC1
         core::arch::asm!("out 0x20, al", in("al") 0x20u8, options(nomem, nostack));
