@@ -21,6 +21,7 @@ mod audio;
 mod usb;
 mod power;
 mod ipc;
+mod tss;
 mod users;
 
 use core::panic::PanicInfo;
@@ -77,6 +78,9 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
     
     usb::init();
     serial::print("USB initialized.\n");
+    
+    tss::init(0x200000); // kernel stack at 2MB
+    serial::print("TSS initialized.\n");
     
     users::init();
     serial::print("Users initialized.\n");
