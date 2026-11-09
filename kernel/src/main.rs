@@ -140,8 +140,23 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
     }
     
     serial::print("Hello from KiK OS!\n");
-
+    
+    // Main loop - check for keyboard input
+    let mut last = 0u8;
     loop {
+        let sc = idt::get_last_scancode();
+        if sc != 0 && sc != last {
+            last = sc;
+            // Print scancode as hex
+            serial::print("Key: ");
+            // Simple hex print
+            let hi = (sc >> 4) & 0x0F;
+            let lo = sc & 0x0F;
+            let hex_chars = b"0123456789ABCDEF";
+            serial::write_byte(hex_chars[hi as usize]);
+            serial::write_byte(hex_chars[lo as usize]);
+            serial::print("\n");
+        }
         unsafe {
             core::arch::asm!("hlt");
         }
