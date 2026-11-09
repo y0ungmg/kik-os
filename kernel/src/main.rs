@@ -94,10 +94,11 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
         serial::print("PMM alloc_page returned 0!\n");
     }
     
-    // Test syscall
-    let result = syscalls::handle_syscall(1, 1, 0, 0);
-    if result == 0 {
-        serial::print("Syscall test passed.\n");
+    // Test syscalls
+    let r1 = syscalls::handle_syscall(1, 1, 0, 0);
+    let r2 = syscalls::handle_syscall(39, 0, 0, 0);
+    if r1 == 0 && r2 == 1 {
+        serial::print("Syscall tests passed.\n");
     }
     
     serial::print("Hello from KiK OS!\n");
