@@ -5,6 +5,9 @@ pub const SYS_READ: u64 = 0;
 pub const SYS_EXIT: u64 = 60;
 pub const SYS_GETPID: u64 = 39;
 pub const SYS_SLEEP: u64 = 35;
+pub const SYS_FORK: u64 = 57;
+pub const SYS_EXEC: u64 = 59;
+pub const SYS_WAIT: u64 = 61;
 
 static mut CURRENT_PID: u64 = 1;
 
@@ -29,6 +32,18 @@ pub fn handle_syscall(num: u64, arg1: u64, _arg2: u64, _arg3: u64) -> u64 {
         SYS_SLEEP => {
             // arg1 = seconds
             0
+        }
+        SYS_FORK => {
+            // Create a new process
+            0 // Not implemented yet
+        }
+        SYS_EXEC => {
+            // Execute a program
+            0 // Not implemented yet
+        }
+        SYS_WAIT => {
+            // Wait for a process
+            0 // Not implemented yet
         }
         _ => {
             // Unknown syscall
