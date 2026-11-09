@@ -39,9 +39,18 @@ extern "C" fn exception_handler() {
 }
 
 extern "C" fn irq_handler() {
-    // Timer IRQ (IRQ0)
-    // Send EOI
+    // Read interrupt number from stack (simplified - assume timer or keyboard)
+    // For now, just send EOI
     unsafe {
+        // Check if keyboard data is available
+        let status: u8;
+        core::arch::asm!("in al, 0x64", out("al") status, options(nomem, nostack));
+        if status & 0x01 != 0 {
+            let scancode: u8;
+            core::arch::asm!("in al, 0x60", out("al") scancode, options(nomem, nostack));
+            // Store scancode (for now, just discard)
+            let _ = scancode;
+        }
         // EOI to PIC1
         core::arch::asm!("out 0x20, al", in("al") 0x20u8, options(nomem, nostack));
     }
