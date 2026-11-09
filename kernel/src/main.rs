@@ -68,11 +68,11 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
     timer::init(100);
     serial::print("Timer initialized.\n");
     
-    // Enable interrupts after timer init
-    // unsafe {
-    //     core::arch::asm!("sti");
-    // }
-    // serial::print("Interrupts enabled.\n");
+    // Enable interrupts
+    unsafe {
+        core::arch::asm!("sti");
+    }
+    serial::print("Interrupts enabled.\n");
     
     keyboard::init();
     serial::print("Keyboard initialized.\n");

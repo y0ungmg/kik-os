@@ -29,8 +29,7 @@ pub fn init() {
         
         // Unmask timer IRQ (IRQ0)
         unsafe {
-            outb(PIC1_DATA, 0xFF); // Mask all IRQs
-            outb(PIC2_DATA, 0xFF);
+            outb(PIC1_DATA, 0xFE); // Enable only IRQ0 (timer)
         }
     }
 }
