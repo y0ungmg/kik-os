@@ -43,7 +43,7 @@
 - Keyboard: basic init ✓
 - PCI enumeration: deferred (too slow under QEMU)
 - Framebuffer: working ✓ (1280x800 @ 0x80000000, window drawn with white bg + blue title bar)
-- Storage driver: not yet
+- Storage driver: ATA/IDE PIO mode ✓ (read_sector, write_sector, init with IDENTIFY)
 - KiKFS: basic init ✓
 - Network: basic init ✓
 - Audio: basic init ✓
