@@ -33,7 +33,7 @@
 - System calls: SYS_READ, SYS_WRITE, SYS_EXIT, SYS_GETPID, SYS_SLEEP, SYS_FORK, SYS_EXEC, SYS_WAIT ✓
 - Context switching: module present with switch_context implementation ✓
 - Processes: process management module ✓ (create_process)
-- User-mode execution: TSS module with GDT TSS descriptor loaded, usermode module with switch_to_user_mode (iretq) ✓
+- User-mode execution: TSS module with GDT TSS descriptor loaded, usermode module with switch_to_user_mode (iretq) ✓ - TESTED (prints 'U' to serial from ring 3)
 - IPC: message passing working ✓
 - GDT: expanded to 7 entries (null, kernel code/data, user code/data, TSS descriptor) ✓
 - IDT: 48 entries with exception and IRQ handlers ✓
