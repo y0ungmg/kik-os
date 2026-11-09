@@ -142,6 +142,16 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
             );
             // Draw a red pixel at (10, 10)
             fb.set_pixel(10, 10, 0x00FF0000);
+            // Draw a blue rectangle
+            let mut y = 50;
+            while y < 100 {
+                let mut x = 50;
+                while x < 150 {
+                    fb.set_pixel(x, y, 0x000000FF);
+                    x += 1;
+                }
+                y += 1;
+            }
             serial::print("Framebuffer test: pixel drawn.\n");
         }
     }
