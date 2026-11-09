@@ -27,10 +27,8 @@ pub fn init() {
         outb(PIC1_DATA, 0x01);
         outb(PIC2_DATA, 0x01);
         
-        // Unmask timer IRQ (IRQ0)
-        unsafe {
-            outb(PIC1_DATA, 0xFC); // Enable IRQ0 (timer) and IRQ1 (keyboard)
-        }
+        // Unmask timer IRQ (IRQ0) and keyboard IRQ (IRQ1)
+        outb(PIC1_DATA, 0xFC); // Enable IRQ0 (timer) and IRQ1 (keyboard)
     }
 }
 pub fn send_eoi(irq: u8) {

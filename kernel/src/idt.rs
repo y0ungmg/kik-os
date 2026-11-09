@@ -43,19 +43,32 @@ static mut LAST_SCANCODE: u8 = 0;
 pub fn get_last_scancode() -> u8 {
     unsafe { LAST_SCANCODE }
 }
-extern "C" fn irq_handler() {
+extern "C" fn keyboard_irq_handler() {
     unsafe {
-        // Check if keyboard data is available
         let status: u8;
         core::arch::asm!("in al, 0x64", out("al") status, options(nomem, nostack));
         if status & 0x01 != 0 {
             let scancode: u8;
             core::arch::asm!("in al, 0x60", out("al") scancode, options(nomem, nostack));
             LAST_SCANCODE = scancode;
-            // Process scancode in keyboard driver
             crate::keyboard::process_scancode(scancode);
         }
         // EOI to PIC1
+        core::arch::asm!("out 0x20, al", in("al") 0x20u8, options(nomem, nostack));
+    }
+}
+
+extern "C" fn mouse_irq_handler() {
+    unsafe {
+        let status: u8;
+        core::arch::asm!("in al, 0x64", out("al") status, options(nomem, nostack));
+        if status & 0x01 != 0 {
+            let byte: u8;
+            core::arch::asm!("in al, 0x60", out("al") byte, options(nomem, nostack));
+            crate::mouse::process_byte(byte);
+        }
+        // EOI to PIC2 and PIC1
+        core::arch::asm!("out 0xA0, al", in("al") 0x20u8, options(nomem, nostack));
         core::arch::asm!("out 0x20, al", in("al") 0x20u8, options(nomem, nostack));
     }
 }
@@ -65,8 +78,12 @@ pub fn init() {
     while i < IDT_ENTRIES {
         let handler_addr = if i < 32 {
             exception_handler as u64
+        } else if i == 33 {
+            keyboard_irq_handler as u64
+        } else if i == 44 {
+            mouse_irq_handler as u64
         } else {
-            irq_handler as u64
+            keyboard_irq_handler as u64 // default for other IRQs
         };
         unsafe {
             IDT[i].offset_low = (handler_addr & 0xFFFF) as u16;

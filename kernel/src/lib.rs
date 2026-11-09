@@ -10,6 +10,7 @@ mod pmm;
 mod heap;
 mod timer;
 mod keyboard;
+mod mouse;
 mod framebuffer;
 mod vmm;
 mod scheduler;

@@ -2,6 +2,7 @@
 #![no_std]
 #![no_main]
 
+pub mod mouse;
 mod serial;
 mod log;
 mod gdt;
@@ -80,9 +81,11 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
     
     keyboard::init();
     serial::print("Keyboard initialized.\n");
+    // mouse::init(); // Deferred - PS/2 controller init hangs
+    // serial::print("Mouse initialized.\n");
     
-    pci::enumerate();
-    serial::print("PCI enumeration done.\n");
+    // pci::enumerate(); // Deferred - causes intermittent hangs
+    serial::print("PCI skipped.\n");
     
     kikfs::init();
     serial::print("KiKFS initialized.\n");
