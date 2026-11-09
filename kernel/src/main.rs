@@ -18,6 +18,7 @@ mod framebuffer;
 mod kikfs;
 mod net;
 mod audio;
+mod ata;
 mod usb;
 mod power;
 mod ipc;
@@ -84,6 +85,9 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
     
     kikfs::init();
     serial::print("KiKFS initialized.\n");
+    
+    ata::init();
+    serial::print("ATA storage initialized.\n");
     
     net::init();
     serial::print("Network initialized.\n");
