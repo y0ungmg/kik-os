@@ -34,7 +34,7 @@ impl Compositor {
     }
 
     pub fn draw_all(&mut self) {
-        // Draw windows only (skip taskbar for performance)
+        // Draw windows only (background is already set by framebuffer init)
         let mut i = 0usize;
         while i < self.window_count {
             if let Some(ref win) = self.windows[i] {
