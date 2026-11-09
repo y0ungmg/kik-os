@@ -194,11 +194,22 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
                         serial::print("  clear  - clear screen\n");
                         serial::print("  ver    - show version\n");
                         serial::print("  echo   - echo text\n");
+                        serial::print("  mem    - show memory info\n");
                     } else if input_line[0] == b'v' && input_line[1] == b'e' && input_line[2] == b'r' {
                         serial::print("KiK OS v0.1.0 - Bare metal Rust kernel\n");
                     } else if input_line[0] == b'c' && input_line[1] == b'l' && input_line[2] == b'e' && input_line[3] == b'a' && input_line[4] == b'r' {
                         // Clear screen (ANSI escape)
                         serial::print("\x1B[2J\x1B[H");
+                    } else if input_line[0] == b'e' && input_line[1] == b'c' && input_line[2] == b'h' && input_line[3] == b'o' {
+                        // Echo command: print everything after "echo "
+                        let mut ei = 5usize;
+                        while ei < input_pos {
+                            serial::write_byte(input_line[ei]);
+                            ei += 1;
+                        }
+                        serial::print("\n");
+                    } else if input_line[0] == b'm' && input_line[1] == b'e' && input_line[2] == b'm' {
+                        serial::print("Memory: PMM 4MB (1024 pages)\n");
                     } else {
                         serial::print("Unknown command. Type 'help' for commands.\n");
                     }
