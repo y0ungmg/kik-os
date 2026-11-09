@@ -38,9 +38,12 @@ extern "C" fn exception_handler() {
     }
 }
 
+static mut LAST_SCANCODE: u8 = 0;
+
+pub fn get_last_scancode() -> u8 {
+    unsafe { LAST_SCANCODE }
+}
 extern "C" fn irq_handler() {
-    // Read interrupt number from stack (simplified - assume timer or keyboard)
-    // For now, just send EOI
     unsafe {
         // Check if keyboard data is available
         let status: u8;
@@ -48,8 +51,7 @@ extern "C" fn irq_handler() {
         if status & 0x01 != 0 {
             let scancode: u8;
             core::arch::asm!("in al, 0x60", out("al") scancode, options(nomem, nostack));
-            // Store scancode (for now, just discard)
-            let _ = scancode;
+            LAST_SCANCODE = scancode;
         }
         // EOI to PIC1
         core::arch::asm!("out 0x20, al", in("al") 0x20u8, options(nomem, nostack));
