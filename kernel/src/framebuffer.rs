@@ -26,10 +26,14 @@ impl Framebuffer {
     }
     
     pub fn clear(&self, color: u32) {
-        for y in 0..self.height {
-            for x in 0..self.width {
+        let mut y = 0;
+        while y < self.height {
+            let mut x = 0;
+            while x < self.width {
                 self.set_pixel(x, y, color);
+                x += 1;
             }
+            y += 1;
         }
     }
 }

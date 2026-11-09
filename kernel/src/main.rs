@@ -116,6 +116,10 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
         serial::print("IPC send test passed.\n");
     }
     
+    // Test framebuffer (if available from boot info)
+    // For now, just verify the module compiles
+    serial::print("Framebuffer module ready.\n");
+    
     // Test syscalls
     let r1 = syscalls::handle_syscall(1, 1, 0, 0);
     let r2 = syscalls::handle_syscall(39, 0, 0, 0);
