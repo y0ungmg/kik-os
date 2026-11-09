@@ -188,6 +188,31 @@ fn main() -> Status {
         let _ = stdout.write_str("Page tables set up.\n");
     });
 
+    // Try to get GOP framebuffer info
+    let (fb_addr, fb_width, fb_height, fb_pitch, fb_bpp) = {
+        use uefi::proto::console::gop::GraphicsOutput;
+        match uefi::boot::get_handle_for_protocol::<GraphicsOutput>() {
+            Ok(handle) => {
+                match uefi::boot::open_protocol_exclusive::<GraphicsOutput>(handle) {
+                    Ok(mut gop) => {
+                        let mode_info = gop.current_mode_info();
+                        let (width, height) = mode_info.resolution();
+let mut fb = gop.frame_buffer();
+                        let addr = fb.as_mut_ptr() as u64;
+                        let pitch = mode_info.stride() * 4; // 4 bytes per pixel (32bpp)
+                        (addr, width as u32, height as u32, pitch as u32, 32u8)
+                    }
+                    Err(_) => (0u64, 0u32, 0u32, 0u32, 0u8),
+                }
+            }
+            Err(_) => (0u64, 0u32, 0u32, 0u32, 0u8),
+        }
+    };
+    
+    uefi::system::with_stdout(|stdout| {
+        let _ = write!(stdout, "Framebuffer: {}x{} @ {:#x}\\n", fb_width, fb_height, fb_addr);
+    });
+    
     // Create BootInfo
     let boot_info = BootInfo {
         magic: 0x4B694B4F53, // "KiKOS"
@@ -195,11 +220,11 @@ fn main() -> Status {
         kernel_size: KERNEL.len() as u64,
         memory_map_addr: 0,
         memory_map_count: 0,
-        framebuffer_addr: 0,
-        framebuffer_width: 0,
-        framebuffer_height: 0,
-        framebuffer_pitch: 0,
-        framebuffer_bpp: 0,
+        framebuffer_addr: fb_addr,
+        framebuffer_width: fb_width,
+        framebuffer_height: fb_height,
+        framebuffer_pitch: fb_pitch,
+        framebuffer_bpp: fb_bpp,
         boot_mode: 1, // UEFI
     };
 

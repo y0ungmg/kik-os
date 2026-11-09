@@ -129,9 +129,22 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
         serial::print("IPC send test passed.\n");
     }
     
-    // Test framebuffer (if available from boot info)
-    // For now, just verify the module compiles
-    serial::print("Framebuffer module ready.\n");
+    // Test framebuffer from boot info
+    if !_boot_info.is_null() {
+        let bi = unsafe { &*_boot_info };
+        if bi.framebuffer_addr != 0 {
+            let fb = framebuffer::Framebuffer::new(
+                bi.framebuffer_addr,
+                bi.framebuffer_width,
+                bi.framebuffer_height,
+                bi.framebuffer_pitch,
+                bi.framebuffer_bpp,
+            );
+            // Draw a red pixel at (10, 10)
+            fb.set_pixel(10, 10, 0x00FF0000);
+            serial::print("Framebuffer test: pixel drawn.\n");
+        }
+    }
     
     // Test process management
     let pid = process::create_process(0x1000);
