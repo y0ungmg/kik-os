@@ -34,31 +34,7 @@ impl Compositor {
     }
 
     pub fn draw_all(&mut self) {
-        // Draw desktop background (skip full clear for performance)
-        // Only draw taskbar at bottom
-        let mut ty = 760usize;
-        while ty < 800 {
-            let mut tx = 0usize;
-            while tx < 1280 {
-                self.fb.set_pixel(tx as u32, ty as u32, 0x00202030);
-                tx += 1;
-            }
-            ty += 1;
-        }
-        
-        // Draw clock area on taskbar (right side)
-        // Simple: draw a small rectangle for clock
-        let mut cy = 765usize;
-        while cy < 795 {
-            let mut cx = 1180usize;
-            while cx < 1270 {
-                self.fb.set_pixel(cx as u32, cy as u32, 0x00303040);
-                cx += 1;
-            }
-            cy += 1;
-        }
-        
-        // Draw windows
+        // Draw windows only (skip taskbar for performance)
         let mut i = 0usize;
         while i < self.window_count {
             if let Some(ref win) = self.windows[i] {

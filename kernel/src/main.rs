@@ -138,7 +138,6 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
     if ipc::send_message(msg) {
         serial::print("IPC send test passed.\n");
     }
-    
     // Draw window on framebuffer (info from bootloader at 0x9000)
     let bi_ptr = 0x9000 as *const BootInfo;
     let fb_addr = unsafe { (*bi_ptr).framebuffer_addr };
