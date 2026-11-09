@@ -3,6 +3,7 @@
 #![no_main]
 
 mod serial;
+mod log;
 mod gdt;
 mod idt;
 mod pmm;
