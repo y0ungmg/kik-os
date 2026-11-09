@@ -229,6 +229,11 @@ let mut fb = gop.frame_buffer();
     };
 
     let boot_info_ptr = &boot_info as *const BootInfo;
+    // Write framebuffer info to fixed location 0x9000 for kernel to read
+    let info_ptr = 0x9000 as *mut BootInfo;
+    unsafe {
+        *info_ptr = boot_info;
+    }
 
     uefi::system::with_stdout(|stdout| {
         let _ = write!(stdout, "Entry point: {:x}\n", elf_header.entry);

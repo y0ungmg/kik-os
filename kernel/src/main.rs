@@ -25,11 +25,13 @@ mod tss;
 mod usermode;
 mod pic;
 mod process;
+mod window;
 mod users;
 
 use core::panic::PanicInfo;
 
 #[repr(C)]
+#[derive(Copy, Clone)]
 pub struct BootInfo {
     pub magic: u64,
     pub kernel_load_addr: u64,
@@ -49,7 +51,7 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
     serial::init();
     serial::print("KiK OS kernel starting...\n");
     
-    gdt::init();
+    gdt::init(tss::get_tss_addr(), (core::mem::size_of::<tss::Tss>() - 1) as u32);
     serial::print("GDT initialized.\n");
     
     idt::init();
@@ -129,32 +131,19 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
         serial::print("IPC send test passed.\n");
     }
     
-    // Test framebuffer from boot info
-    if !_boot_info.is_null() {
-        let bi = unsafe { &*_boot_info };
-        if bi.framebuffer_addr != 0 {
-            let fb = framebuffer::Framebuffer::new(
-                bi.framebuffer_addr,
-                bi.framebuffer_width,
-                bi.framebuffer_height,
-                bi.framebuffer_pitch,
-                bi.framebuffer_bpp,
-            );
-            // Draw a red pixel at (10, 10)
-            fb.set_pixel(10, 10, 0x00FF0000);
-            // Draw a blue rectangle
-            let mut y = 50;
-            while y < 100 {
-                let mut x = 50;
-                while x < 150 {
-                    fb.set_pixel(x, y, 0x000000FF);
-                    x += 1;
-                }
-                y += 1;
-            }
-            serial::print("Framebuffer test: pixel drawn.\n");
+    // Draw window on framebuffer (info from bootloader at 0x9000)
+    let bi_ptr = 0x9000 as *const BootInfo;
+    let (fb_addr, fb_pitch) = unsafe {
+        if !bi_ptr.is_null() {
+            let bi = &*bi_ptr;
+            (bi.framebuffer_addr, bi.framebuffer_pitch)
+        } else {
+            (0x80000000u64, 5120u32)
         }
-    }
+    };
+    let win = window::Window::new(100, 100, 50, 30, "KiK Window");
+    win.draw(fb_addr, fb_pitch);
+    serial::print("Window drawn on framebuffer.\n");
     
     // Test process management
     let pid = process::create_process(0x1000);
@@ -172,7 +161,6 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
             last = sc;
             // Print scancode as hex
             serial::print("Key: ");
-            // Simple hex print
             let hi = (sc >> 4) & 0x0F;
             let lo = sc & 0x0F;
             let hex_chars = b"0123456789ABCDEF";
@@ -182,6 +170,20 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
         }
         unsafe {
             core::arch::asm!("hlt");
+        }
+    }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn user_main() -> ! {
+    // Write to a user-accessible memory location (0x9000)
+    unsafe {
+        let ptr = 0x9100 as *mut u64;
+        *ptr = 0x55; // 'U'
+    }
+    loop {
+        unsafe {
+            core::arch::asm!("nop");
         }
     }
 }

@@ -16,6 +16,6 @@ pub fn switch_to_user_mode(user_rip: u64, user_rsp: u64) -> ! {
             rsp = in(reg) user_rsp,
             rip = in(reg) user_rip,
             options(noreturn)
-        );
+        )
     }
 }

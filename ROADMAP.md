@@ -31,21 +31,25 @@
 ## MILESTONE 3 — Multitasking (PARTIAL)
 - Scheduler: 1-task (static array limited by UEFI) ✓
 - System calls: SYS_READ, SYS_WRITE, SYS_EXIT, SYS_GETPID, SYS_SLEEP, SYS_FORK, SYS_EXEC, SYS_WAIT ✓
-- Context switching: module present
+- Context switching: module present with switch_context implementation ✓
 - Processes: process management module ✓ (create_process)
-- User-mode execution: TSS module added, usermode module added
+- User-mode execution: TSS module with GDT TSS descriptor loaded, usermode module with switch_to_user_mode (iretq) ✓
 - IPC: message passing working ✓
+- GDT: expanded to 7 entries (null, kernel code/data, user code/data, TSS descriptor) ✓
+- IDT: 48 entries with exception and IRQ handlers ✓
+- TSS: loaded via LTR, RSP0 set ✓
 
 ## MILESTONE 4 — Hardware and Storage (PARTIAL)
 - Keyboard: basic init ✓
 - PCI enumeration: deferred (too slow under QEMU)
-- Framebuffer: module present, for-loops converted
+- Framebuffer: working ✓ (1280x800 @ 0x80000000, window drawn with white bg + blue title bar)
 - Storage driver: not yet
 - KiKFS: basic init ✓
 - Network: basic init ✓
 - Audio: basic init ✓
 - USB: basic init ✓
 - Power management: basic init ✓
+- UEFI GOP framebuffer: integrated in bootloader, passed to kernel via 0x9000 ✓
 
 ## MILESTONE 5 — User Space (PARTIAL)
 - Init process: stub (builds successfully)
@@ -53,12 +57,18 @@
 - Native libraries: not yet
 - Terminal: stub
 - Basic shell: stub (builds successfully)
-- TSS: module added ✓
+- TSS: module added ✓, GDT descriptor loaded ✓
 - IPC: message passing working ✓
 - Users: basic init ✓
 - Process management: create_process ✓
+- User-mode: switch_to_user_mode (iretq) implemented ✓, page table U/S support ✓
 
-## MILESTONE 6 — Graphics (PLANNED)
+## MILESTONE 6 — Graphics (IN PROGRESS)
+- Framebuffer driver: working ✓ (set_pixel, clear)
+- Window manager: Window struct with draw (background + title bar) ✓
+- Window drawn on UEFI GOP framebuffer ✓
+- Compositor: not yet
+- Desktop environment: not yet
 ## MILESTONE 7 — Desktop Applications (PLANNED)
 ## MILESTONE 8 — Advanced Functionality (PLANNED)
 ## MILESTONE 9 — Release Engineering (PLANNED)

@@ -20,7 +20,7 @@ pub struct GdtPointer {
 }
 
 // GDT entries
-static mut GDT: [GdtEntry; 5] = [
+static mut GDT: [GdtEntry; 7] = [
     // Null descriptor
     GdtEntry { limit_low: 0, base_low: 0, base_mid: 0, access: 0, granularity: 0, base_high: 0 },
     // Kernel code segment (64-bit)
@@ -31,11 +31,30 @@ static mut GDT: [GdtEntry; 5] = [
     GdtEntry { limit_low: 0xFFFF, base_low: 0, base_mid: 0, access: 0xFA, granularity: 0xAF, base_high: 0 },
     // User data segment
     GdtEntry { limit_low: 0xFFFF, base_low: 0, base_mid: 0, access: 0xF2, granularity: 0xCF, base_high: 0 },
+    // TSS descriptor (low) - will be filled at init
+    GdtEntry { limit_low: 0, base_low: 0, base_mid: 0, access: 0, granularity: 0, base_high: 0 },
+    // TSS descriptor (high) - will be filled at init
+    GdtEntry { limit_low: 0, base_low: 0, base_mid: 0, access: 0, granularity: 0, base_high: 0 },
 ];
 
-pub fn init() {
+pub fn init(tss_addr: u64, tss_limit: u32) {
+    
+    unsafe {
+        // Low descriptor (entry 5)
+        GDT[5].limit_low = tss_limit as u16;
+        GDT[5].base_low = (tss_addr & 0xFFFF) as u16;
+        GDT[5].base_mid = ((tss_addr >> 16) & 0xFF) as u8;
+        GDT[5].access = 0x89; // TSS available
+        GDT[5].granularity = ((tss_limit >> 16) & 0x0F) as u8;
+        GDT[5].base_high = ((tss_addr >> 24) & 0xFF) as u8;
+        
+        // High descriptor (entry 6) - upper 32 bits of base
+        let gdt6 = &mut GDT[6] as *mut GdtEntry as *mut u64;
+        *gdt6 = tss_addr >> 32;
+    }
+    
     let gdt_ptr = GdtPointer {
-        limit: (size_of::<[GdtEntry; 5]>() - 1) as u16,
+        limit: (size_of::<[GdtEntry; 7]>() - 1) as u16,
         base: &raw const GDT as *const _ as u64,
     };
     
@@ -64,6 +83,13 @@ pub fn init() {
             "push rax",
             "retfq",
             "2:",
+            options(nostack)
+        );
+        
+        // Load TSS
+        core::arch::asm!(
+            "mov ax, 0x28",  // TSS selector (entry 5 * 8 = 0x28)
+            "ltr ax",
             options(nostack)
         );
     }

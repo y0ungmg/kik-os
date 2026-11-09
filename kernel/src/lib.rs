@@ -24,6 +24,7 @@ mod usb;
 mod power;
 mod users;
 mod context_switch;
+mod tss;
 
 // Boot info structure (must match bootloader's definition)
 #[repr(C)]
@@ -47,7 +48,7 @@ pub extern "C" fn _start(boot_info: *const BootInfo) -> ! {
     serial::print("KiK OS kernel starting...\n");
     
     // Initialize GDT
-    gdt::init();
+    gdt::init(tss::get_tss_addr(), (core::mem::size_of::<tss::Tss>() - 1) as u32);
     serial::print("GDT initialized.\n");
     
     // Initialize IDT
