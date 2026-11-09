@@ -19,6 +19,7 @@ mod net;
 mod audio;
 mod usb;
 mod power;
+mod users;
 
 use core::panic::PanicInfo;
 
@@ -74,6 +75,9 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
     
     usb::init();
     serial::print("USB initialized.\n");
+    
+    users::init();
+    serial::print("Users initialized.\n");
     
     power::init();
     serial::print("Power initialized.\n");
