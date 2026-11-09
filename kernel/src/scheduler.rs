@@ -68,7 +68,8 @@ pub fn create_task(entry_point: u64) -> Option<u64> {
         };
         
         // Allocate stack
-        if let Some(stack_base) = crate::pmm::alloc_page() {
+        let stack_base = crate::pmm::alloc_page();
+        if stack_base != 0 {
             ctx.rsp = stack_base as u64 + 4096;
         } else {
             return None;

@@ -1,5 +1,4 @@
 // IDT (Interrupt Descriptor Table) setup for x86_64
-// Deferred: static array writes hang under UEFI
 
 use core::mem::size_of;
 
@@ -40,8 +39,32 @@ extern "C" fn exception_handler() {
 }
 
 pub fn init() {
-    // Deferred under UEFI: writing to static arrays in .bss hangs
-    // even with identity-mapped page tables. The memory may not be
-    // backed by RAM. Will be revisited with bootloader-allocated memory.
+    let mut i = 0;
+    while i < IDT_ENTRIES {
+        let handler_addr = exception_handler as u64;
+        unsafe {
+            IDT[i].offset_low = (handler_addr & 0xFFFF) as u16;
+            IDT[i].selector = 0x08;
+            IDT[i].ist = 0;
+            IDT[i].type_attr = 0x8E;
+            IDT[i].offset_mid = ((handler_addr >> 16) & 0xFFFF) as u16;
+            IDT[i].offset_high = (handler_addr >> 32) as u32;
+            IDT[i].reserved = 0;
+        }
+        i += 1;
+    }
+    let idt_ptr = IdtPointer {
+        limit: (size_of::<[IdtEntry; IDT_ENTRIES]>() - 1) as u16,
+        base: &raw const IDT as *const _ as u64,
+    };
+    
+    unsafe {
+        core::arch::asm!(
+            "lidt [{}]",
+            in(reg) &idt_ptr,
+            options(nostack)
+        );
+    }
+    
     let _ = (IDT_ENTRIES, exception_handler as u64, size_of::<IdtEntry>());
 }

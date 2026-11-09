@@ -1,9 +1,7 @@
 // Physical Memory Manager (PMM) - simple bitmap allocator
 
-// Removed unused imports
-
 const PAGE_SIZE: usize = 4096;
-const MAX_PAGES: usize = 1024 * 1024; // 4GB max
+const MAX_PAGES: usize = 1024; // 4MB max (reduced for UEFI compatibility)
 
 static mut BITMAP: [u64; MAX_PAGES / 64] = [0; MAX_PAGES / 64];
 static mut TOTAL_PAGES: usize = 0;
@@ -12,7 +10,11 @@ static mut FREE_PAGES: usize = 0;
 pub fn init(total_memory_bytes: usize) {
     unsafe {
         TOTAL_PAGES = total_memory_bytes / PAGE_SIZE;
+        if TOTAL_PAGES > MAX_PAGES { TOTAL_PAGES = MAX_PAGES; }
         FREE_PAGES = TOTAL_PAGES;
+        if TOTAL_PAGES > 0 {
+            BITMAP[0] |= 1; // mark page 0 as used
+        }
     }
 }
 
@@ -34,16 +36,25 @@ fn is_page_used(page: usize) -> bool {
     }
 }
 
-pub fn alloc_page() -> Option<usize> {
+pub fn is_page_used_pub(page: usize) -> bool {
+    is_page_used(page)
+}
+
+pub fn set_page_used_pub(page: usize) {
+    set_page_used(page)
+}
+
+pub fn alloc_page() -> usize {
     unsafe {
-        for i in 0..TOTAL_PAGES {
+        let mut i = 0;
+        while i < TOTAL_PAGES {
             if !is_page_used(i) {
                 set_page_used(i);
-                FREE_PAGES -= 1;
-                return Some(i * PAGE_SIZE);
+                return i * PAGE_SIZE;
             }
+            i += 1;
         }
-        None
+        0 // 0 = failure (page 0 is always used)
     }
 }
 
@@ -57,10 +68,10 @@ pub fn free_page(addr: usize) {
     }
 }
 
-pub fn free_pages_count() -> usize {
-    unsafe { FREE_PAGES }
+pub fn total_pages_pub() -> usize {
+    unsafe { TOTAL_PAGES }
 }
 
-pub fn total_pages_count() -> usize {
-    unsafe { TOTAL_PAGES }
+pub fn free_pages_count() -> usize {
+    unsafe { FREE_PAGES }
 }

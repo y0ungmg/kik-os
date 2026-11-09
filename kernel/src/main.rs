@@ -48,7 +48,7 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
     idt::init();
     serial::print("IDT initialized.\n");
     
-    pmm::init(128 * 1024 * 1024);
+    pmm::init(1024 * 1024); // 1MB (reduced for UEFI static-write compat)
     serial::print("PMM initialized.\n");
     
     heap::init();
@@ -80,6 +80,19 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
     
     scheduler::init();
     serial::print("Scheduler initialized.\n");
+    
+    // Test alloc_page
+    serial::print("Testing alloc_page...\n");
+    let tp = pmm::total_pages_pub();
+    serial::print("total_pages checked.\n");
+    let page = pmm::alloc_page();
+    serial::print("alloc_page returned.\n");
+    if page != 0 {
+        serial::print("PMM alloc_page test passed.\n");
+        pmm::free_page(page);
+    } else {
+        serial::print("PMM alloc_page returned 0!\n");
+    }
     
     // Test syscall
     let result = syscalls::handle_syscall(1, 1, 0, 0);
