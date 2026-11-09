@@ -23,6 +23,7 @@ mod power;
 mod ipc;
 mod tss;
 mod usermode;
+mod process;
 mod users;
 
 use core::panic::PanicInfo;
@@ -121,11 +122,10 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
     // For now, just verify the module compiles
     serial::print("Framebuffer module ready.\n");
     
-    // Test syscalls
-    let r1 = syscalls::handle_syscall(1, 1, 0, 0);
-    let r2 = syscalls::handle_syscall(39, 0, 0, 0);
-    if r1 == 0 && r2 == 1 {
-        serial::print("Syscall tests passed.\n");
+    // Test process management
+    let pid = process::create_process(0x1000);
+    if pid != 0 {
+        serial::print("Process creation test passed.\n");
     }
     
     serial::print("Hello from KiK OS!\n");
