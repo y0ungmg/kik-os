@@ -66,8 +66,8 @@
 ## MILESTONE 6 — Graphics (IN PROGRESS)
 - Framebuffer driver: working ✓ (set_pixel, clear)
 - Window manager: Window struct with draw (background + title bar) ✓
-- Window drawn on UEFI GOP framebuffer ✓
-- Compositor: not yet
+- Compositor: multi-window with z-ordering, draw_all ✓
+- 2 windows drawn on UEFI GOP framebuffer ✓
 - Desktop environment: not yet
 ## MILESTONE 7 — Desktop Applications (PLANNED)
 ## MILESTONE 8 — Advanced Functionality (PLANNED)
