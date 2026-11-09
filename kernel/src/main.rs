@@ -155,6 +155,11 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
     comp.draw_all();
     serial::print("Compositor: 2 windows drawn.\n");
     
+    // Test VMM: read CR3
+    let cr3 = vmm::get_cr3();
+    serial::print("VMM: CR3 read OK.\n");
+    serial::print("VMM test done.\n");
+    
     // Test process management
     let pid = process::create_process(0x1000);
     if pid != 0 {

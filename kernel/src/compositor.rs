@@ -33,9 +33,21 @@ impl Compositor {
         true
     }
 
-    pub fn draw_all(&self) {
-        // Draw windows in order (back to front) - skip full clear for performance
-        let mut i = 0;
+    pub fn draw_all(&mut self) {
+        // Draw desktop background (skip full clear for performance - use window backgrounds)
+        // Only draw taskbar at bottom
+        let mut ty = 760usize;
+        while ty < 800 {
+            let mut tx = 0usize;
+            while tx < 1280 {
+                self.fb.set_pixel(tx as u32, ty as u32, 0x00202030);
+                tx += 1;
+            }
+            ty += 1;
+        }
+    
+        // Draw windows
+        let mut i = 0usize;
         while i < self.window_count {
             if let Some(ref win) = self.windows[i] {
                 win.draw(self.fb.address, self.fb.pitch);
