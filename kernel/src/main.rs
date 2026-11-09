@@ -22,6 +22,7 @@ mod usb;
 mod power;
 mod ipc;
 mod tss;
+mod usermode;
 mod users;
 
 use core::panic::PanicInfo;
