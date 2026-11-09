@@ -1,5 +1,4 @@
 // Task State Segment (TSS) for x86_64
-
 #[repr(C, packed)]
 pub struct Tss {
     pub reserved0: u32,
@@ -17,6 +16,9 @@ pub struct Tss {
     pub reserved2: u64,
     pub reserved3: u16,
     pub iopb_offset: u16,
+    // I/O permission bitmap (8192 bytes = 65536 ports / 8)
+    // All zeros = all ports accessible from ring 3
+    pub iopb: [u8; 8192],
 }
 
 static mut TSS: Tss = Tss {
@@ -34,15 +36,21 @@ static mut TSS: Tss = Tss {
     ist7: 0,
     reserved2: 0,
     reserved3: 0,
-    iopb_offset: 0xFFFF, // No I/O permission bitmap
+    iopb_offset: 104, // Offset of iopb field within TSS (0x68)
+    iopb: [0; 8192],
 };
 
 pub fn init(kernel_stack: u64) {
     unsafe {
         TSS.rsp0 = kernel_stack;
+        // iopb_offset already set to 104 (0x68)
     }
 }
 
 pub fn get_tss_addr() -> u64 {
     &raw const TSS as *const _ as u64
+}
+
+pub fn get_tss_size() -> usize {
+    core::mem::size_of::<Tss>()
 }

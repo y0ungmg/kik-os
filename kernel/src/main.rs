@@ -153,6 +153,9 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
     
     serial::print("Hello from KiK OS!\n");
     
+    // User mode tested successfully (prints 'U' to serial) - see user_main()
+    // Uncomment to test: usermode::switch_to_user_mode(user_main as u64, 0x300000);
+    
     // Main loop - check for keyboard input
     let mut last = 0u8;
     loop {
@@ -176,10 +179,13 @@ pub extern "C" fn _start(_boot_info: *const BootInfo) -> ! {
 
 #[unsafe(no_mangle)]
 pub extern "C" fn user_main() -> ! {
-    // Write to a user-accessible memory location (0x9000)
+    // Write 'U' to serial port (I/O allowed via TSS IOPB)
     unsafe {
-        let ptr = 0x9100 as *mut u64;
-        *ptr = 0x55; // 'U'
+        core::arch::asm!(
+            "mov dx, 0x3F8",
+            "mov al, 0x55",  // 'U'
+            "out dx, al",
+        );
     }
     loop {
         unsafe {
